@@ -2,12 +2,10 @@
 '''
 File: exercise.py
 '''
-
-
-        return key
-rt redis
+import redis
 import uuid
 from typing import Callable, Union
+
 
 class Cache:
     def __init__(self):
@@ -35,3 +33,4 @@ class Cache:
 
     def get_int(self, key: str) -> Union[int, None]:
         return self.get(key, fn=int) if self.get(key) is not None else None
+
