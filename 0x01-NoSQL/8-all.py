@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bini/env python3
 '''
 File: 8-all.py
 '''
