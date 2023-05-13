@@ -1,8 +1,10 @@
-#!/usr/bin/env python3.8
+#!/usr/bin/env python3
 '''
 File: 12-log_stats.py
 '''
 
+
+from pymongo import MongoClient
 def main():
     '''
     script that provides some stats about Nginx logs stored in MongoDB
@@ -10,7 +12,7 @@ def main():
     client = MongoClient()
     collection = client.logs.nginx
     logs_count = collection.count_documents({})
-    print(f"{logs_count} logs")
+    print("{} logs".format(logs_count))
 
     methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
     for method in methods:
