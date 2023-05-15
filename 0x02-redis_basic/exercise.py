@@ -5,7 +5,7 @@ File: exercise.py
 import redis
 import uuid
 from typing import Callable, Union
-
+import json
 
 def count_calls(method: Callable) -> Callable:
     '''
@@ -13,11 +13,31 @@ def count_calls(method: Callable) -> Callable:
     '''
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
-        key = "count:{}".format(method.__qualname__)
+        key = method.__qualname__
         self._redis.incr(key)
         return method(self, *args, **kwargs)
     return wrapper
 
+
+def call_history(method: Callable) -> Callable:
+    '''
+    Decorator to store history of inputs and outputs in Redis
+    '''
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        inputs_key = "{}:inputs".format(method.__qualname__)
+        outputs_key = "{}:outputs".format(method.__qualname__)
+        
+        input_str = json.dumps(args)
+        self._redis.rpush(inputs_key, input_str)
+        
+        output = method(self, *args, **kwargs)
+        output_str = str(output)
+        self._redis.rpush(outputs_key, output_str)
+        
+        return output
+    
+    return wrapper
 
 class Cache:
     '''
@@ -30,6 +50,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @call_history
     @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         '''
